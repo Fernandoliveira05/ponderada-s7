@@ -1,11 +1,12 @@
-from domain.figurinhas_domain import Figurinha
-from domain.figurinhas_domain import db, FigurinhaModel
+from app import db
+from app.domain.figurinhas_domain import Figurinha, FigurinhaModel
+from app.repositories.figurinhas_interface import IFigurinhaRepository
 
-class FigurinhaRepository:
-    def create(self, figurinha: Figurinha) -> None:
+class FigurinhaRepository(IFigurinhaRepository):
+    def create(self, figurinha: Figurinha) -> Figurinha:
         db_model = FigurinhaModel(
-            id=figurinha.id,
             numero=figurinha.numero,
+            tipo=figurinha.tipo,
             posicao=figurinha.posicao,
             created_at=figurinha.created_at,
             updated_at=figurinha.updated_at
@@ -13,14 +14,25 @@ class FigurinhaRepository:
         
         db.session.add(db_model)
         db.session.commit()
+        
+        figurinha.id = db_model.id
+        return figurinha
     
-    def get_all(self) -> list[Figurinha]:
-        db_models = FigurinhaModel.query.all()
+    def get_all(self, tipo: str = None, posicao: str = None) -> list[Figurinha]:
+        query = FigurinhaModel.query
+    
+        if tipo:
+            query = query.filter(FigurinhaModel.tipo == tipo)
+        if posicao:
+            query = query.filter(FigurinhaModel.posicao == posicao)
+    
+        db_models = query.all()
         return [
             Figurinha(
                 id=db_model.id,
                 numero=db_model.numero,
                 posicao=db_model.posicao,
+                tipo=db_model.tipo,
                 created_at=db_model.created_at,
                 updated_at=db_model.updated_at
             )
@@ -36,6 +48,7 @@ class FigurinhaRepository:
             id=db_model.id,
             numero=db_model.numero,
             posicao=db_model.posicao,
+            tipo=db_model.tipo,
             created_at=db_model.created_at,
             updated_at=db_model.updated_at
         )
@@ -51,5 +64,6 @@ class FigurinhaRepository:
         if db_model:
             db_model.numero = figurinha.numero
             db_model.posicao = figurinha.posicao
+            db_model.tipo = figurinha.tipo
             db_model.updated_at = figurinha.updated_at
             db.session.commit()

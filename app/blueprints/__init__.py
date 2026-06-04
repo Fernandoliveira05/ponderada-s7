@@ -1,3 +1,3 @@
 def register_blueprints(app):
-    from .health import health_bp
-    app.register_blueprint(health_bp)
+    from .figurinhas_handler import figurinha_blueprint
+    app.register_blueprint(figurinha_blueprint)
