@@ -43,7 +43,7 @@ class CreateFigurinhaService:
             raise ValueError(f"O campo '{field_name}' é obrigatório e não pode ser vazio.")
         
 class ListFigurinhasService:
-    def __init__(self, repository: FigurinhaRepository):
+    def __init__(self, repository: IFigurinhaRepository):
         self.repository = repository
 
     def execute(self, tipo: str = None, posicao: str = None) -> list[Figurinha]:
